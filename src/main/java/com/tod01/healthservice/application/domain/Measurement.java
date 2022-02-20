@@ -2,6 +2,8 @@ package com.tod01.healthservice.application.domain;
 
 import java.time.LocalDateTime;
 
+import com.tod01.healthservice.application.domain.enums.MeasurementType;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
