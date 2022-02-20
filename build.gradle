@@ -1,0 +1,85 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'org.springframework.boot' version '2.4.5'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'com.commercehub.gradle.plugin.avro' version '0.22.0'
+}
+
+group = 'br.gabrielsmartins'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+apply from: "$rootDir/repositories.gradle"
+
+ext {
+    set('springCloudVersion', "2020.0.2")
+    set('modelMapperVersion', "2.4.1")
+    set('r2bcPostGreSQLVersion', "0.8.7.RELEASE")
+    set('r2dbcH2Version', "0.8.2.RELEASE")
+    set('avroVersion', "1.10.1")
+    set('confluentVersion', "6.0.1")
+    set('awaitilityVersion', "4.0.3")
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+    implementation 'org.springframework.kafka:spring-kafka'
+
+
+    implementation group: 'io.r2dbc', name: 'r2dbc-postgresql', version: r2bcPostGreSQLVersion
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: modelMapperVersion
+
+    implementation group: 'org.apache.avro', name: 'avro', version: avroVersion
+    implementation group: 'io.confluent', name: 'kafka-schema-registry-client', version: confluentVersion
+    implementation group: 'io.confluent', name: 'kafka-avro-serializer', version: confluentVersion
+
+
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation group: 'io.r2dbc', name: 'r2dbc-h2', version: r2dbcH2Version
+    testImplementation group: 'org.awaitility', name: 'awaitility', version: awaitilityVersion
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy(jacocoTestReport)
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled = true
+        xml.enabled = true
+        csv.enabled = false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+jacoco {
+    toolVersion = '0.8.5'
+}
+
+avro {
+    enableDecimalLogicalType = true
+    outputCharacterEncoding = "UTF-8"
+}
